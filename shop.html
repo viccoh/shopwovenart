@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shop — Shopwovenart</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="wrap" style="padding-top:56px; padding-bottom:56px;">
+  <h1 class="font-display" style="font-size:2.5rem; margin-bottom:8px;">Shop</h1>
+  <p style="color:rgba(43,27,20,0.7); max-width:420px; margin-bottom:32px;">
+    Every piece below is made to order. Pick a size on the product page — larger sizes take a little longer to finish.
+  </p>
+
+  <div id="pill-row" class="pill-row"></div>
+  <div id="shop-grid" class="product-grid"></div>
+  <p id="empty-msg" style="display:none; color:rgba(43,27,20,0.7);">
+    Nothing in this category yet — check back soon, or <a href="shop.html" style="color:var(--clay); text-decoration:underline;">browse everything</a>.
+  </p>
+</div>
+
+<div id="site-footer"></div>
+
+<script src="js/products.js"></script>
+<script src="js/blogPosts.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/layout.js"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const activeCategory = params.get("category");
+  const categories = window.SW_getCategories();
+
+  function pillHtml(label, href, active) {
+    return `<a href="${href}" class="pill ${active ? "active" : ""}">${label}</a>`;
+  }
+  document.getElementById("pill-row").innerHTML =
+    pillHtml("All", "shop.html", !activeCategory) +
+    categories.map(c => pillHtml(c, `shop.html?category=${encodeURIComponent(c)}`, activeCategory === c)).join("");
+
+  const filtered = activeCategory
+    ? window.SW_PRODUCTS.filter(p => p.category === activeCategory)
+    : window.SW_PRODUCTS;
+
+  function renderProductCard(p) {
+    const prices = p.sizes.map(s => s.price);
+    const min = Math.min(...prices), max = Math.max(...prices);
+    const priceLabel = min === max ? swFormatNaira(min) : `${swFormatNaira(min)} – ${swFormatNaira(max)}`;
+    return `
+      <a href="product.html?slug=${p.slug}" class="product-card">
+        <div class="product-card-img"><img src="${p.image}" alt="${p.name}" /></div>
+        <p class="cat">${p.category}</p>
+        <h3 class="font-display">${p.name}</h3>
+        <p class="price">${priceLabel}</p>
+      </a>`;
+  }
+
+  if (filtered.length === 0) {
+    document.getElementById("shop-grid").style.display = "none";
+    document.getElementById("empty-msg").style.display = "block";
+  } else {
+    document.getElementById("shop-grid").innerHTML = filtered.map(renderProductCard).join("");
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Journal — Shopwovenart</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="wrap" style="padding:56px 0;">
+  <h1 class="font-display" style="font-size:2.5rem; margin-bottom:8px;">Journal</h1>
+  <p style="color:rgba(43,27,20,0.7); max-width:420px; margin-bottom:48px;">
+    Notes on the craft, care guides, and what's currently on the hook.
+  </p>
+  <div id="blog-grid" class="blog-grid"></div>
+</div>
+
+<div id="site-footer"></div>
+
+<script src="js/products.js"></script>
+<script src="js/blogPosts.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/layout.js"></script>
+<script>
+  function formatDate(dateStr) {
+    return new Date(dateStr).toLocaleDateString("en-NG", { year: "numeric", month: "long", day: "numeric" });
+  }
+  document.getElementById("blog-grid").innerHTML = window.SW_POSTS.map(post => `
+    <a href="blog-post.html?slug=${post.slug}" class="blog-card">
+      <p class="cat">${post.category} · ${formatDate(post.date)}</p>
+      <h2 class="font-display">${post.title}</h2>
+      <p>${post.excerpt}</p>
+    </a>
+  `).join("");
+</script>
+</body>
+</html>

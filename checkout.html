@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout — Shopwovenart</title>
+<link rel="stylesheet" href="css/style.css" />
+<script src="https://js.paystack.co/v1/inline.js"></script>
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div id="checkout-root" class="wrap" style="padding:56px 0;"></div>
+
+<div id="site-footer"></div>
+
+<script src="js/products.js"></script>
+<script src="js/blogPosts.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/layout.js"></script>
+<script>
+  // Set your real Paystack public key here before going live.
+  // Never put your secret key in any file served to the browser.
+  const PAYSTACK_PUBLIC_KEY = "pk_test_REPLACE_WITH_YOUR_PUBLIC_KEY";
+  const SHIPPING_FLAT_RATE = 2500;
+
+  const root = document.getElementById("checkout-root");
+  const form = { name: "", email: "", phone: "", address: "", city: "" };
+
+  function render() {
+    const items = window.SW_Cart.getItems();
+
+    if (items.length === 0) {
+      root.innerHTML = `
+        <div class="cart-empty">
+          <h1 class="font-display">Your bag is empty</h1>
+          <p>Add something to your bag before checking out.</p>
+          <a href="shop.html" class="btn btn-clay">Shop the collection</a>
+        </div>`;
+      return;
+    }
+
+    const subtotal = window.SW_Cart.subtotal();
+    const total = subtotal + SHIPPING_FLAT_RATE;
+    const formComplete = form.name && form.email && form.phone && form.address && form.city;
+
+    root.innerHTML = `
+      <h1 class="font-display" style="font-size:2.5rem; margin-bottom:40px;">Checkout</h1>
+      <div class="cart-layout">
+        <div>
+          <h2 class="font-display" style="font-size:1.25rem; margin-bottom:16px;">Delivery details</h2>
+          <div class="form-grid">
+            <label class="field"><span>Full name</span><input data-field="name" value="${form.name}" /></label>
+            <label class="field"><span>Email</span><input type="email" data-field="email" value="${form.email}" /></label>
+            <label class="field"><span>Phone number</span><input type="tel" data-field="phone" value="${form.phone}" /></label>
+            <label class="field"><span>City</span><input data-field="city" value="${form.city}" /></label>
+            <label class="field full"><span>Delivery address</span><input data-field="address" value="${form.address}" /></label>
+          </div>
+
+          <h2 class="font-display" style="font-size:1.25rem; margin:32px 0 16px;">Order summary</h2>
+          <div>
+            ${items.map(item => `
+              <div class="order-line">
+                <span>${item.name} · ${item.sizeLabel} × ${item.quantity}</span>
+                <span>${swFormatNaira(item.price * item.quantity)}</span>
+              </div>`).join("")}
+          </div>
+        </div>
+
+        <div class="summary-box">
+          <div class="summary-row"><span>Subtotal</span><span>${swFormatNaira(subtotal)}</span></div>
+          <div class="summary-row"><span>Shipping</span><span>${swFormatNaira(SHIPPING_FLAT_RATE)}</span></div>
+          <div class="summary-row total"><span>Total</span><span>${swFormatNaira(total)}</span></div>
+
+          <div style="margin-top:24px;">
+            ${!formComplete ? `<p style="font-size:12px; color:rgba(43,27,20,0.6); margin-bottom:12px;">Fill in your delivery details above to continue to payment.</p>` : ""}
+            <div id="checkout-error" style="font-size:12px; color:var(--clay); margin-bottom:12px; display:none;"></div>
+            <button id="pay-btn" class="btn btn-clay" style="width:100%;" ${formComplete ? "" : "disabled"}>
+              Pay with Paystack
+            </button>
+            <p id="verifying-msg" style="font-size:12px; color:rgba(43,27,20,0.6); margin-top:8px; display:none;">Confirming your payment…</p>
+          </div>
+        </div>
+      </div>`;
+
+    root.querySelectorAll("[data-field]").forEach(input => {
+      input.addEventListener("input", (e) => {
+        form[e.target.dataset.field] = e.target.value;
+        const payBtn = document.getElementById("pay-btn");
+        const complete = form.name && form.email && form.phone && form.address && form.city;
+        if (payBtn) payBtn.disabled = !complete;
+      });
+    });
+
+    document.getElementById("pay-btn")?.addEventListener("click", handlePay);
+  }
+
+  function handlePay() {
+    if (!window.PaystackPop) {
+      alert("Payment is still loading — try again in a moment.");
+      return;
+    }
+    if (PAYSTACK_PUBLIC_KEY.includes("REPLACE_WITH")) {
+      alert("Add your real Paystack public key in checkout.html before accepting live payments.");
+      return;
+    }
+    const subtotal = window.SW_Cart.subtotal();
+    const total = subtotal + SHIPPING_FLAT_RATE;
+
+    const handler = window.PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: form.email,
+      amount: Math.round(total * 100), // Paystack expects kobo
+      currency: "NGN",
+      metadata: { customer: form, items: window.SW_Cart.getItems() },
+      callback: function (response) {
+        // In production, send response.reference to your own server to
+        // verify with Paystack's secret key before treating this as paid.
+        // A static site has no server of its own — see the README for how
+        // to add a small verification endpoint (e.g. a Vercel/Netlify
+        // function) before going live with real payments.
+        window.SW_Cart.clear();
+        window.location.href = "checkout-success.html?ref=" + encodeURIComponent(response.reference);
+      },
+      onClose: function () {}
+    });
+    handler.openIframe();
+  }
+
+  render();
+</script>
+</body>
+</html>

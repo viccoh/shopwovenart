@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shopwovenart — Hand-crocheted throw pillows &amp; blankets</title>
+<meta name="description" content="Hand-crocheted throw pillows and blankets, made to order in small batches." />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<section class="hero">
+  <div class="wrap grid">
+    <div>
+      <h1 class="font-display">Colour, worked one stitch at a time.</h1>
+      <p>Shopwovenart makes hand-crocheted throw pillows and blankets in small batches — every square counted, every colour run chosen by hand before it's ever chained.</p>
+      <div class="hero-cta">
+        <a href="shop.html" class="btn btn-clay">Shop the collection</a>
+        <a href="blog-post.html?slug=how-a-granny-square-is-built" class="btn btn-outline">See how it's made</a>
+      </div>
+    </div>
+    <div class="hero-img">
+      <img src="images/granny-square-set.jpg" alt="Sunset granny square throw blanket and matching cushion on a dark leather sofa" />
+    </div>
+  </div>
+</section>
+
+<section class="pad">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="font-display">Currently making</h2>
+      <a href="shop.html">View all</a>
+    </div>
+    <div id="featured-products" class="product-grid"></div>
+  </div>
+</section>
+
+<section class="process-band">
+  <div class="wrap pad">
+    <h2 class="font-display" style="max-width:420px; margin-bottom:40px;">From yarn to your sofa</h2>
+    <div class="process-grid">
+      <div>
+        <div class="step-num">1</div>
+        <h3>Choose a colourway</h3>
+        <p>Every pattern comes in a small set of colour runs, built from yarn we've already tested together — no clashing combinations to worry about.</p>
+      </div>
+      <div>
+        <div class="step-num">2</div>
+        <h3>It's crocheted to order</h3>
+        <p>Nothing sits in a warehouse. Once you order, your piece goes into the queue and is made by hand, usually within seven to twelve days.</p>
+      </div>
+      <div>
+        <div class="step-num">3</div>
+        <h3>Blocked, finished, shipped</h3>
+        <p>Each piece is steam-blocked flat before its border and fringe go on, then packed and shipped with tracking.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pad">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="font-display">From the journal</h2>
+      <a href="blog.html">Read more</a>
+    </div>
+    <div id="journal-preview" class="journal-grid"></div>
+  </div>
+</section>
+
+<section class="closing-band">
+  <div class="wrap row">
+    <div class="msg">
+      <svg width="44" height="44" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="38" height="38" rx="2" stroke="#C24B23" stroke-width="2" />
+        <rect x="7" y="7" width="26" height="26" rx="2" stroke="#E4A93B" stroke-width="2" />
+        <rect x="13" y="13" width="14" height="14" rx="1" stroke="#3E9B93" stroke-width="2" />
+        <rect x="17" y="17" width="6" height="6" rx="1" fill="#2C2560" />
+      </svg>
+      <p class="font-display">Every piece is one of a kind — order yours today.</p>
+    </div>
+    <a href="shop.html" class="btn btn-marigold" style="white-space:nowrap;">Shop the collection</a>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="js/products.js"></script>
+<script src="js/blogPosts.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/layout.js"></script>
+<script>
+  function renderProductCard(p) {
+    const prices = p.sizes.map(s => s.price);
+    const min = Math.min(...prices), max = Math.max(...prices);
+    const priceLabel = min === max ? swFormatNaira(min) : `${swFormatNaira(min)} – ${swFormatNaira(max)}`;
+    return `
+      <a href="product.html?slug=${p.slug}" class="product-card">
+        <div class="product-card-img"><img src="${p.image}" alt="${p.name}" /></div>
+        <p class="cat">${p.category}</p>
+        <h3 class="font-display">${p.name}</h3>
+        <p class="price">${priceLabel}</p>
+      </a>`;
+  }
+
+  document.getElementById("featured-products").innerHTML =
+    window.SW_PRODUCTS.filter(p => p.featured).map(renderProductCard).join("");
+
+  document.getElementById("journal-preview").innerHTML =
+    window.SW_POSTS.slice(0, 3).map(post => `
+      <a href="blog-post.html?slug=${post.slug}">
+        <p class="cat">${post.category}</p>
+        <h3 class="font-display">${post.title}</h3>
+        <p>${post.excerpt}</p>
+      </a>`).join("");
+</script>
+</body>
+</html>

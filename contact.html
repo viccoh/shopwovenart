@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contact us — Shopwovenart</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="wrap" style="padding:56px 0;">
+  <div style="display:grid; gap:64px;" class="contact-grid">
+    <div>
+      <h1 class="font-display" style="font-size:2.5rem; margin-bottom:16px;">Contact us</h1>
+      <p style="color:rgba(43,27,20,0.7); max-width:340px;">
+        Questions about a custom colourway, an order, or a wholesale enquiry — send a note and we'll get back to you within a couple of business days.
+      </p>
+      <div style="margin-top:32px; font-size:14px; color:rgba(43,27,20,0.7); line-height:1.8;">
+        <p>hello@shopwovenart.com</p>
+        <p>Lagos, Nigeria</p>
+      </div>
+    </div>
+
+    <form id="contact-form">
+      <label class="field"><span>Name</span><input name="name" required /></label>
+      <label class="field"><span>Email</span><input type="email" name="email" required /></label>
+      <label class="field"><span>Message</span><textarea name="message" rows="5" required></textarea></label>
+      <button type="submit" class="btn btn-clay">Send message</button>
+      <p id="contact-sent" style="color:var(--teal); margin-top:12px; display:none;">Message sent — thank you.</p>
+    </form>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+
+<script src="js/products.js"></script>
+<script src="js/blogPosts.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/layout.js"></script>
+<script>
+  // This form has no backend on a static site — it currently just confirms
+  // locally. Wire it to a form service (Formspree, Getform, Basin) or your
+  // own serverless function before launch so messages actually arrive.
+  document.getElementById("contact-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    e.target.style.display = "none";
+    document.getElementById("contact-sent").style.display = "block";
+  });
+</script>
+
+<style>
+  @media (min-width: 768px) { .contact-grid { grid-template-columns: 1fr 1fr; } }
+</style>
+</body>
+</html>
